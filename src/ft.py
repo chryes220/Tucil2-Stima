@@ -6,13 +6,7 @@ import matplotlib.pyplot as plt
 data = datasets.load_iris()
 data.data = data.data[:,:2]
 
-print(data.data)
 ch = myConvexHull(data.data.tolist())
-print(ch.vertices)
-print(ch.points)
-print(ch.contained)
-print(ch.lines)
-ch.visualize()
 
 data2 = [[0,1], [2,4], [4,4], [0,0], [1,1], [3,1], [3,2]]
 '''

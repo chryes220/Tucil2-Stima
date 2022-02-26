@@ -66,22 +66,28 @@ class myConvexHull:
         det = (point_line1[0] * point_line2[1]) + (point[0] * point_line1[1]) + (point_line2[0] * point[1]) - (point[0] * point_line2[1]) - (point_line2[0] * point_line1[1]) - (point_line1[0] * point[1])
         return det
 
+    def get_distance (self, p1, p2, point) :
+        # menghitung jarak point dari garis yang dibentuk p1 dan p2
+        a = p1[1] - p2[1]
+        b = p2[0] - p1[0]
+        c = (p1[0] * p2[1]) - (p2[0] * p1[1])
+        denom = math.sqrt(a**2 + b**2)
+        if (denom != 0) :
+            return (abs(((a * point[0]) + (b * point[1]) + c)/denom))
+        else :
+            return -1
+
     def find_furthest_idx(self, point_line1, point_line2, region) :
         # mengembalikan indeks dari titik terjauh dengan garis dan memasukkan indeks yang bukan merupakan paling jauh ke dalam contained
         # dipastikan len(region) > 1
         furthest = -1
         idx = -1
-        a = point_line1[1] - point_line2[1]
-        b = point_line2[0] - point_line1[0]
-        c = (point_line1[0] * point_line2[1]) - (point_line2[0] * point_line1[1])
 
         for point in region :
-            denom = math.sqrt(a**2 + b**2)
-            if (denom != 0) :
-                dist = abs(((a * point[0]) + (b * point[1]) + c)/denom)
-                if (dist > furthest) :
-                    furthest = dist
-                    idx = self.points.index(point)
+            dist = self.get_distance(point_line1, point_line2, point) 
+            if (dist != -1 and dist > furthest) :
+                furthest = dist
+                idx = self.points.index(point)
         return idx
 
     def is_contained(self, p1, p2, p3, point) :
@@ -101,6 +107,19 @@ class myConvexHull:
         for point in region :
             if (self.is_contained(p1, p2, p3, point)) :
                 self.contained.add(self.points.index(point))
+
+    def divide_region(self, p1, p2, p3, region) :
+        # isi dari region akan dibagi berdasarkan kedekatannya dengan garis p13 dan p23
+        reg1 = [] # berisi titik-titik yang lebih dekat ke garis p13
+        reg2 = [] # berisi titik-titik yang lebih dekat ke garis p23
+        for point in region :
+            dist1 = self.get_distance(p1, p3, point)
+            dist2 = self.get_distance(p2, p3, point)
+            if (dist1 < dist2) :
+                reg1.append(point)
+            else :
+                reg2.append(point)
+        return (reg1, reg2)
 
     def findConvexHull (self, point_line1, point_line2, region) :
         # region : array of points
@@ -130,15 +149,15 @@ class myConvexHull:
             new_triangleA_created = False
             new_triangleB_created = False
 
-
+            print("point1, point2", point_line1, point_line2)
             # if any of the region is contained already, just skip
             # find furthest point in the not-contained area
             # then, update the vertices and lines
             if (a_is_not_contained) :
                 furthestA = self.find_furthest_idx(point_line1, point_line2, regA)
                 '''
-                print("regA : ", regA)
-                print("furthestA : ", furthestA) '''
+                print("regA : ", regA)'''
+                print("furthestA : ", self.points[furthestA])
                 self.vertices.append(furthestA)
                 self.lines.append([pl1_idx, furthestA])
                 self.lines.append([pl2_idx, furthestA])
@@ -150,13 +169,14 @@ class myConvexHull:
                         regA.pop(regA.index(point))
                 new_triangleA_created = (furthestA != -1)
                 # bagi region menjadi yang lebih dekat dengan masing-masing
-                self.findConvexHull(point_line1, self.points[furthestA], regA)
-                self.findConvexHull(point_line2, self.points[furthestA], regA)
+                regs = self.divide_region(point_line1, point_line2, self.points[furthestA], regA)
+                self.findConvexHull(point_line1, self.points[furthestA], regs[0])
+                self.findConvexHull(point_line2, self.points[furthestA], regs[1])
             if (b_is_not_contained) :
                 furthestB = self.find_furthest_idx(point_line1, point_line2, regB)
                 '''
-                print("regB : ", regB)
-                print("furthestB : ", furthestB) '''
+                print("regB : ", regB)'''
+                print("furthestB : ", self.points[furthestB])
                 self.vertices.append(furthestB)
                 self.lines.append([pl1_idx, furthestB])
                 self.lines.append([pl2_idx, furthestB])
@@ -166,13 +186,16 @@ class myConvexHull:
                     if (self.points.index(point) in self.contained) :
                         regB.pop(regB.index(point))
                 new_triangleB_created = (furthestB != -1)
-                self.findConvexHull(point_line1, self.points[furthestB], regB)
-                self.findConvexHull(point_line2, self.points[furthestB], regB)
+
+                regs = self.divide_region(point_line1, point_line2, self.points[furthestB], regB)
+                self.findConvexHull(point_line1, self.points[furthestB], regs[0])
+                self.findConvexHull(point_line2, self.points[furthestB], regs[1])
 
             
             # delete the line created by point_line1 and point_line2
             if(new_triangleA_created or new_triangleB_created) :
                 self.lines.pop(self.lines.index([pl1_idx, pl2_idx]))
+            self.visualize()
 
     def visualize (self) :
         # berhubung kita cuma punya points sama lines yang berbentuk array
