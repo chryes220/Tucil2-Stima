@@ -6,21 +6,16 @@ import pandas as pd
 import math
 
 class myConvexHull:
-    points = [] # berisi point (point didefinisikan sebagai array of float dengan panjang 2 elemen)
-    vertices = [] # berisi indeks dari point dalam points yang membentuk convex hull
-    lines = [] # berisi point-point yang membentuk garis convex hull (didefinisikan sebagai array of integer dengan panjang 2 element)
-    contained = set() # set yang berisi indeks dari point-point yang sudah berada di dalam area
-    data = []
-    df = []
+    #points = [] # berisi point (point didefinisikan sebagai array of float dengan panjang 2 elemen)
+    #vertices = [] # berisi indeks dari point dalam points yang membentuk convex hull
+    #lines = [] # berisi point-point yang membentuk garis convex hull (didefinisikan sebagai array of integer dengan panjang 2 element)
+    #contained = set() # set yang berisi indeks dari point-point yang sudah berada di dalam area
 
     def __init__(self, data) :
-        # arr_of_points bertipe Bunch, namun diubah dan diolah dalam bentuk array of points
-        '''
-        self.data = data # Bunch masih disimpan
-        self.df = pd.DataFrame(data.data, columns=data.feature_names) # juga disimpan dalam bentuk data frame
-        self.df['Target'] = pd.DataFrame(data.target) 
-        self.points = data.data[:,:2].tolist()'''
         self.points = data
+        self.vertices = []
+        self.lines = []
+        self.contained = set()
 
         #print("points : ", self.points)
         #print([4.6, 3.1] in self.points)
@@ -41,6 +36,7 @@ class myConvexHull:
         init_reg.pop(init_reg.index(right_point))
 
         self.findConvexHull(left_point, right_point, init_reg)
+
 
     def find_outer_points (self) :
         # mencari point-point dengan nilai absis terendah dan tertinggi
@@ -154,7 +150,7 @@ class myConvexHull:
             else :
                 reg2.append(point)'''
         return (reg1, reg2)
-
+    '''
     def visualize (self) :
         # berhubung kita cuma punya points sama lines yang berbentuk array
         plt.figure(figsize = (10, 6))
@@ -169,7 +165,7 @@ class myConvexHull:
             plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], 'bo-')
             #plt.plot([self.points[line[0]][0], self.points[line[1]][0]], [self.points[line[0]][1], self.points[line[1]][1]], 'bo-')
         plt.legend()
-        plt.show()
+        plt.show()'''
 
     def print_contained(self) :
         arr = []

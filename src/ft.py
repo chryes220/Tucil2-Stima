@@ -14,23 +14,23 @@ df['Target'] = pd.DataFrame(data.target)
 
 bucket0 = df[df['Target'] == 0]
 bucket0 = bucket0.iloc[:,[0,1]].values.tolist()
-hull0 = myConvexHull(bucket0)
+#hull0 = myConvexHull(bucket0)
 
-for line in hull0.lines:
-    plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], 'bo-')
+#for line in hull0.lines:
+#    plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], 'bo-')
 
 bucket1 = df[df['Target'] == 1]
 bucket1 = bucket1.iloc[:,[0,1]].values.tolist()
-hull1 = myConvexHull(bucket1)
-for line in hull1.lines:
-    plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], 'bo-')
+#hull1 = myConvexHull(bucket1)
+#for line in hull1.lines:
+    #plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], 'bo-')
 
 bucket2 = df[df['Target'] == 2]
 bucket2 = bucket2.iloc[:,[0,1]].values.tolist()
-hull2 = myConvexHull(bucket2)
+#hull2 = myConvexHull(bucket2)
 
-plt.legend()
-plt.show()
+#plt.legend()
+#plt.show()
 
 '''
 plt.figure(figsize = (10, 6))
@@ -42,7 +42,6 @@ plt.show()'''
 #ch = myConvexHull(bucket)
 #ch.visualize()
 
-'''
 plt.figure(figsize = (10, 6))
 colors = ['b','r','g']
 plt.title('Petal Width vs Petal Length')
@@ -54,13 +53,13 @@ for i in range(len(data.target_names)):
     bucket = df[df['Target'] == i]
     bucket = bucket.iloc[:,[0,1]].values.tolist()
     print(bucket)
-    hull = myConvexHull(bucket) #bagian ini diganti dengan hasil implementasi ConvexHull Divide & Conquer
+    #hull = myConvexHull(bucket) #bagian ini diganti dengan hasil implementasi ConvexHull Divide & Conquer
     #hull.visualize()
-    #plt.scatter(bucket[:][0], bucket[:][1], label=data.target_names[i])
-    #for line in hull.lines:
-        #plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], colors[i]+'o-')
-#plt.legend()
-#plt.show()'''
+    plt.scatter(bucket[:][0], bucket[:][1], label=data.target_names[i])
+    for line in myConvexHull(bucket).lines:
+        plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], colors[i]+'o-')
+plt.legend()
+plt.show()
 
 data2 = [[0,1], [2,4], [4,4], [0,0], [1,1], [3,1], [3,2]]
 '''
