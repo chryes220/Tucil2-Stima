@@ -6,19 +6,12 @@ import pandas as pd
 import math
 
 class myConvexHull:
-    #points = [] # berisi point (point didefinisikan sebagai array of float dengan panjang 2 elemen)
-    #vertices = [] # berisi indeks dari point dalam points yang membentuk convex hull
-    #lines = [] # berisi point-point yang membentuk garis convex hull (didefinisikan sebagai array of integer dengan panjang 2 element)
-    #contained = set() # set yang berisi indeks dari point-point yang sudah berada di dalam area
 
     def __init__(self, data) :
-        self.points = data
-        self.vertices = []
-        self.lines = []
-        self.contained = set()
-
-        #print("points : ", self.points)
-        #print([4.6, 3.1] in self.points)
+        self.points = data.tolist() # berisi point (point didefinisikan sebagai array of float dengan panjang 2 elemen)
+        self.vertices = [] # berisi indeks dari point dalam points yang membentuk convex hull
+        self.lines = [] # berisi point-point yang membentuk garis convex hull (didefinisikan sebagai array of integer dengan panjang 2 element)
+        self.contained = set() # set yang berisi indeks dari point-point yang sudah berada di dalam area
 
         outer = self.find_outer_points()
 
@@ -104,7 +97,6 @@ class myConvexHull:
                 self.contained.add(self.points.index(point))
 
     def divide_region(self, p1, p2, p3, region) :
-        # kalo ga salah p1, p2, dan p3 udah buka bagian dari region
         # cari garis yang tegak lurus dengan garis yang dibentuk oleh titik p1 dan p2 dan melewati titik p3
         # bagi region berdasarkan tempat titik berada relatif terhadap garis tersebut
         reg1 = [] # berisi titik-titik yang berada di daerah yang sama dengan p1
@@ -133,7 +125,6 @@ class myConvexHull:
         
         # sign1 dan sign2 menandakan tanda dari determinan, True untuk + dan False untuk -
         sign1 = (self.determinant(p3, [x,y], p1) > 0)
-        sign2 = (self.determinant(p3, [x,y], p2) > 0)
 
         for point in region :
             sign = (self.determinant(p3, [x,y], point) > 0)
@@ -141,37 +132,8 @@ class myConvexHull:
                 reg1.append(point)
             else :
                 reg2.append(point)
-        '''
-        for point in region :
-            dist1 = self.get_distance(p1, p3, point)
-            dist2 = self.get_distance(p2, p3, point)
-            if (dist1 < dist2) :
-                reg1.append(point)
-            else :
-                reg2.append(point)'''
-        return (reg1, reg2)
-    '''
-    def visualize (self) :
-        # berhubung kita cuma punya points sama lines yang berbentuk array
-        plt.figure(figsize = (10, 6))
-        colors = ['b','r','g']
-        plt.title('Petal Width vs Petal Length')
-        plt.xlabel('sepal length')
-        plt.ylabel('sepal width')
-        # sudah bikin 'ruang' untuk plot, waktunya memplot
-        for point in self.points :
-            plt.plot(point[0], point[1], 'bo')
-        for line in self.lines :
-            plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], 'bo-')
-            #plt.plot([self.points[line[0]][0], self.points[line[1]][0]], [self.points[line[0]][1], self.points[line[1]][1]], 'bo-')
-        plt.legend()
-        plt.show()'''
 
-    def print_contained(self) :
-        arr = []
-        for i in self.contained :
-            arr.append(self.points[i])
-        #print("contained ", arr)
+        return (reg1, reg2)
 
     def update_region (self, reg) :
         new_reg = []
@@ -185,8 +147,6 @@ class myConvexHull:
     def findConvexHull (self, point_line1, point_line2, region) :
         # region : array of points
         # point_line1, point_line2 : point
-        #print("pl1, pl2 ", point_line1, point_line2)
-        #print("region ", region)
         if (len(region) > 0) :
             regA = [] # list dari point yang berada di daerah kiri/atas
             regB = [] # list dari point yang berada di daerah kanan/bawah
@@ -202,59 +162,41 @@ class myConvexHull:
                 else :
                     regB.append(point)
 
-            #print("regA : ", regA)
-            #print("regB : ", regB)
-                    
-
             a_is_not_contained = (len(regA) > 0 and not self.points.index(regA[0]) in self.contained)
             b_is_not_contained = (len(regB) > 0 and not self.points.index(regB[0]) in self.contained)
 
             new_triangleA_created = False
             new_triangleB_created = False
 
-            #print("point1, point2", point_line1, point_line2)
             # if any of the region is contained already, just skip
             # find furthest point in the not-contained area
             # then, update the vertices and lines
             if (a_is_not_contained) :
                 furthestA = self.find_furthest_idx(point_line1, point_line2, regA)
 
-                #print("furthestA : ", self.points[furthestA])
                 self.vertices.append(furthestA)
                 self.lines.append([point_line1, self.points[furthestA]])
                 self.lines.append([point_line2, self.points[furthestA]])
                 # setelah terbentuk segitiga dalam region, update dulu point-point mana aja yang masuk ke segitiga
                 self.update_contained(point_line1, point_line2, self.points[furthestA], regA)
-                self.print_contained()
-
                 self.update_region(regA)
-                #print("regA after update ", regA)
                 new_triangleA_created = (furthestA != -1)
                 # bagi region menjadi yang lebih dekat dengan masing-masing
                 regs = self.divide_region(point_line1, point_line2, self.points[furthestA], regA)
-                #print("region 1 ", regs[0])
-                #print("region 2 ", regs[1])
                 self.findConvexHull(point_line1, self.points[furthestA], regs[0])
                 self.findConvexHull(point_line2, self.points[furthestA], regs[1])
 
             if (b_is_not_contained) :
                 furthestB = self.find_furthest_idx(point_line1, point_line2, regB)
     
-                #print("furthestB : ", self.points[furthestB])
                 self.vertices.append(furthestB)
                 self.lines.append([point_line1, self.points[furthestB]])
                 self.lines.append([point_line2, self.points[furthestB]])
                 self.update_contained(point_line1, point_line2, self.points[furthestB], regB)
-                self.print_contained()
-                
                 self.update_region(regB)
-
-                #print("regB after update ", regB)
                 new_triangleB_created = (furthestB != -1)
 
                 regs = self.divide_region(point_line1, point_line2, self.points[furthestB], regB)
-                #print("region 1 ", regs[0])
-                #print("region 2 ", regs[1])
                 self.findConvexHull(point_line1, self.points[furthestB], regs[0])
                 self.findConvexHull(point_line2, self.points[furthestB], regs[1])
 
@@ -262,5 +204,3 @@ class myConvexHull:
             # delete the line created by point_line1 and point_line2
             if(new_triangleA_created or new_triangleB_created) :
                 self.lines.pop(self.lines.index([point_line1, point_line2]))
-
-            #self.visualize()
