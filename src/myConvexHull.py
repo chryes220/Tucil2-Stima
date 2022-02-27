@@ -136,10 +136,26 @@ class myConvexHull:
         plt.legend()
         plt.show()
 
+    def print_contained(self) :
+        arr = []
+        for i in self.contained :
+            arr.append(self.points[i])
+        print("contained ", arr)
+
+    def update_region (self, reg) :
+        new_reg = []
+        for point in reg :
+            # abaikan point yang sudah berada di dalam bidang
+            if not (self.points.index(point) in self.contained) :
+                new_reg.append(point)
+
+        reg = new_reg
+
     def findConvexHull (self, point_line1, point_line2, region) :
         # region : array of points
         # point_line1, point_line2 : point
         print("pl1, pl2 ", point_line1, point_line2)
+        print("region ", region)
         if (len(region) > 0) :
             regA = [] # list dari point yang berada di daerah kiri/atas
             regB = [] # list dari point yang berada di daerah kanan/bawah
@@ -152,8 +168,11 @@ class myConvexHull:
                     self.contained.add(self.points.index(point))
                 elif (det > 0) :
                     regA.append(point)
-                elif (det < 0) :
+                else :
                     regB.append(point)
+
+            print("regA : ", regA)
+            print("regB : ", regB)
                     
 
             a_is_not_contained = (len(regA) > 0 and not self.points.index(regA[0]) in self.contained)
@@ -169,39 +188,42 @@ class myConvexHull:
             if (a_is_not_contained) :
                 furthestA = self.find_furthest_idx(point_line1, point_line2, regA)
 
-                print("regA : ", regA)
                 print("furthestA : ", self.points[furthestA])
                 self.vertices.append(furthestA)
                 self.lines.append([point_line1, self.points[furthestA]])
                 self.lines.append([point_line2, self.points[furthestA]])
                 # setelah terbentuk segitiga dalam region, update dulu point-point mana aja yang masuk ke segitiga
                 self.update_contained(point_line1, point_line2, self.points[furthestA], regA)
+                self.print_contained()
 
-                for point in regA :
-                    if (self.points.index(point) in self.contained) :
-                        regA.pop(regA.index(point))
+                self.update_region(regA)
+                print("regA after update ", regA)
                 new_triangleA_created = (furthestA != -1)
                 # bagi region menjadi yang lebih dekat dengan masing-masing
                 regs = self.divide_region(point_line1, point_line2, self.points[furthestA], regA)
+                print("region 1 ", regs[0])
+                print("region 2 ", regs[1])
                 self.findConvexHull(point_line1, self.points[furthestA], regs[0])
                 self.findConvexHull(point_line2, self.points[furthestA], regs[1])
-                
+
             if (b_is_not_contained) :
                 furthestB = self.find_furthest_idx(point_line1, point_line2, regB)
     
-                print("regB : ", regB)
                 print("furthestB : ", self.points[furthestB])
                 self.vertices.append(furthestB)
                 self.lines.append([point_line1, self.points[furthestB]])
                 self.lines.append([point_line2, self.points[furthestB]])
                 self.update_contained(point_line1, point_line2, self.points[furthestB], regB)
+                self.print_contained()
                 
-                for point in regB :
-                    if (self.points.index(point) in self.contained) :
-                        regB.pop(regB.index(point))
+                self.update_region(regB)
+
+                print("regB after update ", regB)
                 new_triangleB_created = (furthestB != -1)
 
                 regs = self.divide_region(point_line1, point_line2, self.points[furthestB], regB)
+                print("region 1 ", regs[0])
+                print("region 2 ", regs[1])
                 self.findConvexHull(point_line1, self.points[furthestB], regs[0])
                 self.findConvexHull(point_line2, self.points[furthestB], regs[1])
 

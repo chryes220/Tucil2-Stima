@@ -15,6 +15,13 @@ df['Target'] = pd.DataFrame(data.target)
 bucket = df[df['Target'] == 0]
 bucket = bucket.iloc[:,[0,1]].values.tolist()
 
+'''
+plt.figure(figsize = (10, 6))
+for point in bucket :
+    plt.plot(point[0], point[1], 'bo')
+plt.show()'''
+
+
 ch = myConvexHull(bucket)
 ch.visualize()
 
