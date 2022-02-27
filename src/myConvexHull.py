@@ -8,36 +8,35 @@ import math
 class myConvexHull:
     points = [] # berisi point (point didefinisikan sebagai array of float dengan panjang 2 elemen)
     vertices = [] # berisi indeks dari point dalam points yang membentuk convex hull
-    lines = [] # berisi indeks dari point-point yang membentuk garis convex hull (didefinisikan sebagai array of integer dengan panjang 2 element)
-    outer = [] # berisi indeks dari dua point terluar, dengan points[outer[0]][0] < points[outer[1]][0]
+    lines = [] # berisi point-point yang membentuk garis convex hull (didefinisikan sebagai array of integer dengan panjang 2 element)
     contained = set() # set yang berisi indeks dari point-point yang sudah berada di dalam area
     data = []
     df = []
-    count_contained = 0
 
     def __init__(self, data) :
         # arr_of_points bertipe Bunch, namun diubah dan diolah dalam bentuk array of points
         '''
         self.data = data # Bunch masih disimpan
         self.df = pd.DataFrame(data.data, columns=data.feature_names) # juga disimpan dalam bentuk data frame
-        self.points = data.data[:,:2].tolist() '''
+        self.df['Target'] = pd.DataFrame(data.target) 
+        self.points = data.data[:,:2].tolist()'''
         self.points = data
 
         #print("points : ", self.points)
         #print([4.6, 3.1] in self.points)
 
-        self.outer = self.find_outer_points()
+        outer = self.find_outer_points()
 
         # since outer points surely create the convex hull
-        self.vertices.append(self.outer[0])
-        self.vertices.append(self.outer[1])
-        self.lines.append([self.outer[0], self.outer[1]])
-        self.contained.add(self.outer[0])
-        self.contained.add(self.outer[1])
+        self.vertices.append(self.points.index(outer[0]))
+        self.vertices.append(self.points.index(outer[1]))
+        self.lines.append([outer[0], outer[1]])
+        self.contained.add(self.points.index(outer[0]))
+        self.contained.add(self.points.index(outer[1]))
 
         init_reg = self.points.copy()
-        left_point = self.points[self.outer[0]]
-        right_point = self.points[self.outer[1]]
+        left_point = outer[0]
+        right_point = outer[1]
         init_reg.pop(init_reg.index(left_point))
         init_reg.pop(init_reg.index(right_point))
 
@@ -50,13 +49,13 @@ class myConvexHull:
         min_x = 999999
         max_x = -1
 
-        for i in range (len(self.points)) :
-            if self.points[i][0] < min_x :
-                min_x = self.points[i][0]
-                res[0] = i
-            if self.points[i][0] > max_x :
-                max_x = self.points[i][0]
-                res[1] = i
+        for point in self.points :
+            if point[0] < min_x :
+                min_x = point[0]
+                res[0] = point
+            if point[0] > max_x :
+                max_x = point[0]
+                res[1] = point
         return res
 
     def determinant(self, point_line1, point_line2, point) :
@@ -121,12 +120,26 @@ class myConvexHull:
                 reg2.append(point)
         return (reg1, reg2)
 
+    def visualize (self) :
+        # berhubung kita cuma punya points sama lines yang berbentuk array
+        plt.figure(figsize = (10, 6))
+        colors = ['b','r','g']
+        plt.title('Petal Width vs Petal Length')
+        plt.xlabel('sepal length')
+        plt.ylabel('sepal width')
+        # sudah bikin 'ruang' untuk plot, waktunya memplot
+        for point in self.points :
+            plt.plot(point[0], point[1], 'bo')
+        for line in self.lines :
+            plt.plot([line[0][0], line[1][0]], [line[0][1], line[1][1]], 'bo-')
+            #plt.plot([self.points[line[0]][0], self.points[line[1]][0]], [self.points[line[0]][1], self.points[line[1]][1]], 'bo-')
+        plt.legend()
+        plt.show()
+
     def findConvexHull (self, point_line1, point_line2, region) :
         # region : array of points
         # point_line1, point_line2 : point
-
-        pl1_idx = self.points.index((point_line1))
-        pl2_idx = self.points.index(point_line2)
+        print("pl1, pl2 ", point_line1, point_line2)
         if (len(region) > 0) :
             regA = [] # list dari point yang berada di daerah kiri/atas
             regB = [] # list dari point yang berada di daerah kanan/bawah
@@ -149,18 +162,18 @@ class myConvexHull:
             new_triangleA_created = False
             new_triangleB_created = False
 
-            print("point1, point2", point_line1, point_line2)
+            #print("point1, point2", point_line1, point_line2)
             # if any of the region is contained already, just skip
             # find furthest point in the not-contained area
             # then, update the vertices and lines
             if (a_is_not_contained) :
                 furthestA = self.find_furthest_idx(point_line1, point_line2, regA)
-                '''
-                print("regA : ", regA)'''
+
+                print("regA : ", regA)
                 print("furthestA : ", self.points[furthestA])
                 self.vertices.append(furthestA)
-                self.lines.append([pl1_idx, furthestA])
-                self.lines.append([pl2_idx, furthestA])
+                self.lines.append([point_line1, self.points[furthestA]])
+                self.lines.append([point_line2, self.points[furthestA]])
                 # setelah terbentuk segitiga dalam region, update dulu point-point mana aja yang masuk ke segitiga
                 self.update_contained(point_line1, point_line2, self.points[furthestA], regA)
 
@@ -172,14 +185,15 @@ class myConvexHull:
                 regs = self.divide_region(point_line1, point_line2, self.points[furthestA], regA)
                 self.findConvexHull(point_line1, self.points[furthestA], regs[0])
                 self.findConvexHull(point_line2, self.points[furthestA], regs[1])
+                
             if (b_is_not_contained) :
                 furthestB = self.find_furthest_idx(point_line1, point_line2, regB)
-                '''
-                print("regB : ", regB)'''
+    
+                print("regB : ", regB)
                 print("furthestB : ", self.points[furthestB])
                 self.vertices.append(furthestB)
-                self.lines.append([pl1_idx, furthestB])
-                self.lines.append([pl2_idx, furthestB])
+                self.lines.append([point_line1, self.points[furthestB]])
+                self.lines.append([point_line2, self.points[furthestB]])
                 self.update_contained(point_line1, point_line2, self.points[furthestB], regB)
                 
                 for point in regB :
@@ -194,20 +208,6 @@ class myConvexHull:
             
             # delete the line created by point_line1 and point_line2
             if(new_triangleA_created or new_triangleB_created) :
-                self.lines.pop(self.lines.index([pl1_idx, pl2_idx]))
-            self.visualize()
+                self.lines.pop(self.lines.index([point_line1, point_line2]))
 
-    def visualize (self) :
-        # berhubung kita cuma punya points sama lines yang berbentuk array
-        plt.figure(figsize = (10, 6))
-        colors = ['b','r','g']
-        plt.title('Petal Width vs Petal Length')
-        plt.xlabel('sepal length')
-        plt.ylabel('sepal width')
-        # sudah bikin 'ruang' untuk plot, waktunya memplot
-        for point in self.points :
-            plt.plot(point[0], point[1], 'bo')
-        for line in self.lines :
-            plt.plot([self.points[line[0]][0], self.points[line[1]][0]], [self.points[line[0]][1], self.points[line[1]][1]], 'bo-')
-        plt.legend()
-        plt.show()
+            self.visualize()

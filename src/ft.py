@@ -3,10 +3,39 @@
 from sklearn import datasets
 from myConvexHull import myConvexHull 
 import matplotlib.pyplot as plt
+import pandas as pd
 data = datasets.load_iris()
-data.data = data.data[:,:2]
 
-ch = myConvexHull(data.data.tolist())
+#ch = myConvexHull(data.data.tolist())
+#ch.visualize()
+
+df = pd.DataFrame(data.data, columns=data.feature_names) 
+df['Target'] = pd.DataFrame(data.target) 
+
+bucket = df[df['Target'] == 0]
+bucket = bucket.iloc[:,[0,1]].values.tolist()
+
+ch = myConvexHull(bucket)
+ch.visualize()
+
+'''
+plt.figure(figsize = (10, 6))
+colors = ['b','r','g']
+plt.title('Petal Width vs Petal Length')
+plt.xlabel(data.feature_names[0])
+plt.ylabel(data.feature_names[1])
+
+for i in range(len(data.target_names)):
+    bucket = df[df['Target'] == i]
+    bucket = bucket.iloc[:,[0,1]].values.tolist()
+    print(bucket)
+    hull = myConvexHull(bucket) #bagian ini diganti dengan hasil implementasi ConvexHull Divide & Conquer
+    #hull.visualize()
+    #plt.scatter(bucket[:][0], bucket[:][1], label=data.target_names[i])
+    #for line in hull.lines:
+        #plt.plot([hull.points[line[0]][0], hull.points[line[1]][0]], [hull.points[line[0]][1], hull.points[line[1]][1]], colors[i])
+plt.legend()
+plt.show()'''
 
 data2 = [[0,1], [2,4], [4,4], [0,0], [1,1], [3,1], [3,2]]
 '''
@@ -25,4 +54,4 @@ print(ch3.points)
 print(ch3.contained)
 print(ch3.lines)
 
-ch3.visualize()'''
+ch3.visualize() '''
