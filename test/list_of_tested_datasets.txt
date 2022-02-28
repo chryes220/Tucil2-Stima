@@ -1,0 +1,8 @@
+List dataset yang diuji :
+
+1. Iris (Petal-length dan Petal-width)
+2. Iris (Sepal-length dan Sepal-width)
+3. Wine (Alcohol dan Malic Acid)
+4. Wine (Color Intensity dan Hue)
+5. Breast Cancer (Radius dan Smoothness)
+6. Breast Cancer (Symmetry dan Fractal Dimension)
