@@ -1,4 +1,4 @@
-# Tucil2-Stima
+# TUGAS KECIL 2 IF2211 STRATEGI ALGORITMA
 
 ## Pembuatan Pustaka Convex Hull dengan Menggunakan Algoritma Divide and Conquer
 Pustaka myConvexHull adalah pustaka buatan yang dapat digunakan untuk mencari Convex Hull dari himpunan titik yang berada pada suatu bidang datar. Pustaka dibangun berdasarkan pustaka ConvexHull dari paket scipy.spatial sebagai referensi. Pustaka ditulis dalam bahasa Python dan berada pada direktori 
@@ -7,7 +7,7 @@ src\myConvexHull.py
 ```
 
 ## Requirement
-Pastikan bahwa pada Python sudah terinstall pada perangkat yang digunakan. Program ini menggunakan beberapa pustaka seperti matplotlib dan pandas yang mungkin tidak bersifat pre-installed pada distribusi standar Python. Oleh karena itu, Anda dapat melakukan instalasi untuk distribusi Anaconda atau melakukan instalasi pustaka yang dibutuhkan menggunakan pip.
+Pastikan bahwa pada Python sudah terinstall pada perangkat yang digunakan. Program ini menggunakan beberapa pustaka seperti matplotlib dan pandas yang mungkin tidak bersifat pre-installed pada distribusi standar Python. Oleh karena itu, Anda dapat menggunakan distribusi Anaconda atau melakukan instalasi pustaka yang dibutuhkan menggunakan pip.
 
 ## Cara Penggunaan Pustaka
 Pada program pengolahan data yang Anda buat, lakukan import untuk pustaka matplotlib, pandas, dan datasets dari paket sklearn, bersamaan dengan pustaka myConvexHull. Pada contoh berikut ini, diasumsikan bahwa file myConvexHull.py berada pada direktori yang sama dengan program utama.
