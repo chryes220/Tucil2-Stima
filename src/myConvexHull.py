@@ -1,8 +1,5 @@
 # myConvexHull.py
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import math
 
 class myConvexHull:
@@ -136,6 +133,7 @@ class myConvexHull:
         return (reg1, reg2)
 
     def update_region (self, reg) :
+        # menghapus elemen-elemen pada region yang sudah berada di dalam hull
         new_reg = []
         for point in reg :
             # abaikan point yang sudah berada di dalam bidang
@@ -145,6 +143,7 @@ class myConvexHull:
         reg = new_reg
 
     def findConvexHull (self, point_line1, point_line2, region) :
+        # membentuk convex hull
         # region : array of points
         # point_line1, point_line2 : point
         if (len(region) > 0) :
